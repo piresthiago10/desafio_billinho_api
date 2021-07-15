@@ -1,0 +1,27 @@
+{
+  "name": "desafio_billinho_api",
+  "version": "1.0.0",
+  "description": "Nessa etapa do processo seletivo vamos precisar que você crie uma API para gerenciar as mensalidades dos alunos. Bora lá?",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/piresthiago10/desafio_billinho_api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/piresthiago10/desafio_billinho_api/issues"
+  },
+  "homepage": "https://github.com/piresthiago10/desafio_billinho_api#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "config": "^3.3.6",
+    "express": "^4.17.1",
+    "pg": "^8.6.0",
+    "sequelize": "^6.6.5"
+  }
+}
