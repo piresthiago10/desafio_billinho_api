@@ -1,3 +1,9 @@
+const CPF = require('cpf');
+const moment = require('moment')
+// Desativa erro de Deprecation Warnings do moment,
+// pois o formato de data utilizado no brasil gera um Warning.
+moment.suppressDeprecationWarnings = true; 
+
 const TableStudents = require('./TableStudents')
 
 class Student {
@@ -12,6 +18,7 @@ class Student {
     }
 
     async create () {
+        this.validation()
         const result = await TableStudents.create({
             name: this.name,
             cpf: this.cpf,
@@ -52,6 +59,30 @@ class Student {
         }
 
         await TableStudents.update(this.id, dataUpdate)
+    }
+
+    delete() {
+        return TableStudents.delete(this.id)
+    }
+
+    validation () {
+        
+        if (typeof this.name !== 'string' || this.name.length === 0) {
+            throw new Error(` O campo '${this.name}' está inválido`)
+        }
+
+        if (typeof this.payment_method !== 'string' || this.payment_method.length === 0) {
+            throw new Error(` O campo '${this.payment_method}' está inválido`)
+        }
+
+        if (CPF.isValid(this.cpf) === false || this.cpf.length === 0) {
+            throw new Error(` O campo '${this.cpf}' está inválido`)
+        }
+
+        if (moment(this.birthdate, "DD/MM/YYYY").isValid() === false || this.birthdate.length === 0){
+            throw new Error(` O campo '${this.birthdate}' está inválido`)
+        }
+
     }
 }
 

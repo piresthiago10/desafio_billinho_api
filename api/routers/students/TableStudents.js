@@ -1,4 +1,5 @@
 const Model = require('./ModelStudents')
+const NotFound = require('../../errors/NotFound')
 
 module.exports = {
     listStudents() {
@@ -17,7 +18,7 @@ module.exports = {
         })
 
         if (!read) {
-            throw new Error('Estudante não encontrado')
+            throw new NotFound()
         }
 
         return read
@@ -30,5 +31,11 @@ module.exports = {
                 where: { id: id }
             }
         )
+    },
+
+    delete(id) {
+        return Model.destroy({
+            where: { id: id }
+        })
     }
 }
