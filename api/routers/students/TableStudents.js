@@ -3,7 +3,7 @@ const NotFound = require('../../errors/NotFound')
 
 module.exports = {
     listStudents() {
-        return Model.findAll()
+        return Model.findAll( { raw: true} )
     },
 
     create(student) {

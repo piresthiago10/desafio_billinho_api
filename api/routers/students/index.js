@@ -1,50 +1,50 @@
 const router = require('express').Router()
 const TableStudents = require('./TableStudents')
 const Student = require('./Student')
-const { request, response } = require('express')
-const NotFound = require('../../errors/NotFound')
+const StudentSerializer = require('../../Serializer').StudentSerializer
 
 router.get('/', async (request, response) => {
-    const result = await TableStudents.listStudents()
+    const results = await TableStudents.listStudents()
     response.status(200)
-    response.send(JSON.stringify(result))
+    const studentSerializer = new StudentSerializer(
+        response.getHeader('Content-Type')
+    )
+    response.send(
+        studentSerializer.serializer(results)
+    )
 })
 
-router.get('/:idStudent', async (request, response) => {
+router.get('/:idStudent', async (request, response, nextMiddleware) => {
     try {
         const id = request.params.idStudent
         const student = new Student({ id: id })
         await student.read()
         response.status(200)
+        const studentSerializer = new StudentSerializer(
+            response.getHeader('Content-Type')
+        )
         response.send(
-            JSON.stringify(student)
+            studentSerializer.serializer(student)
         )
     } catch (error) {
-        response.status(404)
-        response.send(
-            JSON.stringify({
-                mensagem: error.message
-            })
-        )
+        nextMiddleware(error)
     }
 })
 
-router.post('/', async (request, response) => {
+router.post('/', async (request, response, nextMiddleware) => {
     try {
         const receivedData = request.body
         const student = new Student(receivedData)
         await student.create()
         response.status(201)
+        const studentSerializer = new StudentSerializer(
+            response.getHeader('Content-Type')
+        )
         response.send(
-            JSON.stringify(student)
+            studentSerializer.serializer(student)
         )
     } catch (error) {
-        response.status(400)
-        response.send(
-            JSON.stringify({
-                mensagem: error.message
-            })
-        )
+        nextMiddleware(error)
     }
 
 })
@@ -63,7 +63,7 @@ router.put('/:idStudent', async (request, response, nextMiddleware) => {
     }
 })
 
-router.delete('/:idStudent', async (request, response) => {
+router.delete('/:idStudent', async (request, response, nextMiddleware) => {
     try {
         const id = request.params.idStudent
         const student = new Student({ id: id })
@@ -72,12 +72,7 @@ router.delete('/:idStudent', async (request, response) => {
         response.status(204)
         response.end()
     } catch (error) {
-        response.status(404)
-        response.send(
-            JSON.stringify({
-                mensagem: error.message
-            })
-        )
+        nextMiddleware(error)
     }
 })
 
