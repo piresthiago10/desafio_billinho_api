@@ -7,6 +7,7 @@ const InvalidValue = require('./errors/InvalidValue')
 const EmptyData = require('./errors/EmptyData')
 const TypeNotAccepted = require('./errors/TypeNotAccepted')
 const acceptedFormats = require('./Serializer').acceptedFormats
+const ErrorSerializer = require('./Serializer').ErrorSerializer
 
 app.use(bodyParser.json())
 
@@ -51,10 +52,12 @@ app.use((error, request, response, nextMiddleware) => {
         status = 406
     }
 
+    const errorSerializer = new ErrorSerializer(
+        response.getHeader('Content-Type')
+    )
     response.status(status)
-
     response.send(
-        JSON.stringify({
+        errorSerializer.serializer({
             mensagem: error.message,
             id: error.idError
         })
