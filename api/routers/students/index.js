@@ -21,7 +21,8 @@ router.get('/:idStudent', async (request, response, nextMiddleware) => {
         await student.read()
         response.status(200)
         const studentSerializer = new StudentSerializer(
-            response.getHeader('Content-Type')
+            response.getHeader('Content-Type'),
+            ['createdAt', 'updatedAt']
         )
         response.send(
             studentSerializer.serializer(student)
