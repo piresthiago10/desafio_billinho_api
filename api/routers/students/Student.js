@@ -3,8 +3,9 @@ const moment = require('moment')
 // Desativa erro de Deprecation Warnings do moment,
 // pois o formato de data utilizado no brasil gera um Warning.
 moment.suppressDeprecationWarnings = true; 
-
 const TableStudents = require('./TableStudents')
+const InvalidValue = require('../../errors/InvalidValue')
+const EmptyData = require('../../errors/EmptyData')
 
 class Student {
     constructor({ id, name, cpf, birthdate, payment_method, createdAt, updatedAt }) {
@@ -55,7 +56,7 @@ class Student {
         })
 
         if (Object.keys(dataUpdate).length === 0) {
-            throw new Error('Não foram fornecidos dados para atualizar!')
+            throw new EmptyData()
         }
 
         await TableStudents.update(this.id, dataUpdate)
@@ -68,19 +69,19 @@ class Student {
     validation () {
         
         if (typeof this.name !== 'string' || this.name.length === 0) {
-            throw new Error(` O campo '${this.name}' está inválido`)
+            throw new InvalidValue('name')
         }
 
         if (typeof this.payment_method !== 'string' || this.payment_method.length === 0) {
-            throw new Error(` O campo '${this.payment_method}' está inválido`)
+            throw new InvalidValue('payment_method')
         }
 
         if (CPF.isValid(this.cpf) === false || this.cpf.length === 0) {
-            throw new Error(` O campo '${this.cpf}' está inválido`)
+            throw new InvalidValue('cpf')
         }
 
         if (moment(this.birthdate, "DD/MM/YYYY").isValid() === false || this.birthdate.length === 0){
-            throw new Error(` O campo '${this.birthdate}' está inválido`)
+            throw new InvalidValue('birthdate')
         }
 
     }
