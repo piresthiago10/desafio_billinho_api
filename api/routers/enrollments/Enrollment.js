@@ -1,4 +1,6 @@
 const TableEnrollments = require('./TableEnrollments')
+const moment = require('moment')
+moment.suppressDeprecationWarnings = true; 
 
 class Enrollment {
     constructor({ id, amount, installments, due_day, student, createdAt, updatedAt }) {
@@ -25,6 +27,43 @@ class Enrollment {
         this.updatedAt = result.updatedAt
     }
 
+    async read () {
+        const enrollment = await TableEnrollments.readId(this.id, this.student)
+        this.amount = enrollment.amount
+        this.installments = enrollment.installments
+        this.due_day = enrollment.due_day
+        this.createdAt = enrollment.createdAt
+        this.updatedAt = enrollment.updatedAt
+    }
+
+    update () {
+        const dataToUpdate = {}
+
+        if (typeof this.amount === 'number' && this.amount > 0) {
+            dataToUpdate.amount = this.amount
+        }
+
+        if (typeof this.installments === 'number' && this.installments > 0) {
+            dataToUpdate.installments = this.installments
+        }
+
+        if (moment(this.due_day, "DD").isValid() && this.due_day > 0) {
+            dataToUpdate.due_day = this.due_day
+        }
+
+        if (Object.keys(dataToUpdate).length === 0) {
+            throw new Error('Não foram fornecidos dados para serem atualizados!')
+        }
+
+        return TableEnrollments.update(
+            {
+                id: this.id,
+                student: this.student
+            },
+            dataToUpdate
+        )
+    }
+
     delete () {
         return TableEnrollments.delete(this.id, this.student)
     }
@@ -38,7 +77,7 @@ class Enrollment {
             throw new Error('O campo installments está inválido')
         }
 
-        if (typeof this.due_day !== 'number' || this.due_day <= 0){
+        if (moment(this.due_day, "DD").isValid() == false || this.due_day <= 0){
             throw new Error('O campo due_day está inválido')
         }
     }
