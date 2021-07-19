@@ -45,11 +45,28 @@ class StudentSerializer extends Serializer {
     constructor(contentType, extraData) {
         super()
         this.contentType = contentType
-        this.publicData = ['id',
+        this.publicData = [
+            'id',
             'name',
             'cpf',
             'birthdate',
-            'payment_method'].concat(extraData || [])
+            'payment_method'
+        ].concat(extraData || [])
+    }
+}
+
+class EnrollmentSerializer extends Serializer {
+    constructor (contentType, extraData) {
+        super()
+        this.contentType = contentType
+        this.publicData = [
+            'id',
+            'amount',
+            'installments',
+            'due_day',
+        ].concat(extraData || [])
+        this.tagSingular = 'enrollment'
+        this.tagPlural = 'enrollments'
     }
 }
 
@@ -68,5 +85,6 @@ module.exports = {
     Serializer: Serializer,
     StudentSerializer: StudentSerializer,
     ErrorSerializer: ErrorSerializer,
+    EnrollmentSerializer: EnrollmentSerializer,
     acceptedFormats: ['application/json']
 }
