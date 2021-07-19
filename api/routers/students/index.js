@@ -77,4 +77,20 @@ router.delete('/:idStudent', async (request, response, nextMiddleware) => {
     }
 })
 
+const routerEnrollments = require('../enrollments')
+
+const verifyStudent = async (request, response, nextMiddleware) => {
+    try{
+        const idStudent = request.params.idStudent
+        const student = new Student({id: idStudent})
+        await student.read()
+        request.student = student
+        nextMiddleware()
+    } catch (error) {
+        nextMiddleware(error)
+    }
+}
+
+router.use('/:idStudent/enrollment', verifyStudent, routerEnrollments)
+
 module.exports = router
