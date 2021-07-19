@@ -14,10 +14,14 @@ const columns = {
         type: Sequelize.INTEGER,
         allowNull: false
     },
-    discount: {
-        type: Sequelize.ENUM('5', '25', '50', '75'),
-        allowNull: true
-    },
+    student: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+            model: require('../students/ModelStudents'),
+            key: 'id'
+        }
+    }
 }
 
 const options = {
