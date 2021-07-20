@@ -1,5 +1,6 @@
 const { readId } = require('../students/TableStudents')
 const Model = require('./ModelEnrollments')
+const NotFound = require('../../errors/NotFound')
 
 module.exports = {
     listEnrollments(idStudent) {
@@ -26,7 +27,7 @@ module.exports = {
         })
 
         if (!read) {
-            throw new Error('Matrícula não encontrada!')
+            throw new NotFound('Matrícula')
         }
 
         return read

@@ -1,6 +1,8 @@
 const TableEnrollments = require('./TableEnrollments')
 const moment = require('moment')
 moment.suppressDeprecationWarnings = true; 
+const EmptyData = require('../../errors/EmptyData')
+const InvalidValue = require('../../errors/InvalidValue')
 
 class Enrollment {
     constructor({ id, amount, installments, due_day, student, createdAt, updatedAt }) {
@@ -52,7 +54,7 @@ class Enrollment {
         }
 
         if (Object.keys(dataToUpdate).length === 0) {
-            throw new Error('Não foram fornecidos dados para serem atualizados!')
+            throw new EmptyData()
         }
 
         return TableEnrollments.update(
@@ -70,15 +72,15 @@ class Enrollment {
 
     validation () {
         if (typeof this.amount !== 'number' || this.amount <= 0){
-            throw new Error('O campo amount está inválido')
+            throw new InvalidValue('amount')
         }
 
         if (typeof this.installments !== 'number' || this.installments <= 0){
-            throw new Error('O campo installments está inválido')
+            throw new InvalidValue('installments')
         }
 
         if (moment(this.due_day, "DD").isValid() == false || this.due_day <= 0){
-            throw new Error('O campo due_day está inválido')
+            throw new InvalidValue('due_day')
         }
     }
 }
