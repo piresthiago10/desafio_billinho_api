@@ -27,6 +27,11 @@ app.use((request, response, nextMiddleware) => {
     nextMiddleware()
 })
 
+app.use((request, response, nextMiddleware) => {
+    response.set('Access-Control-Allow-Origin', '*')
+    nextMiddleware()
+})
+
 const students = require('./routers/students')
 app.use('/api/students', students)
 
