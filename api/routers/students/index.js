@@ -3,6 +3,14 @@ const TableStudents = require('./TableStudents')
 const Student = require('./Student')
 const StudentSerializer = require('../../Serializer').StudentSerializer
 
+// Lista os metódos http permitidos pela api
+router.options('/', (request, response) => {
+    response.set('Access-Control-Allow-Methods', 'GET, POST')
+    response.set('Access-Control-Allow-Headers', 'Content-Type')
+    response.status(204)
+    response.end()
+})
+
 router.get('/', async (request, response) => {
     const results = await TableStudents.listStudents()
     response.status(200)
@@ -12,24 +20,6 @@ router.get('/', async (request, response) => {
     response.send(
         studentSerializer.serializer(results)
     )
-})
-
-router.get('/:idStudent', async (request, response, nextMiddleware) => {
-    try {
-        const id = request.params.idStudent
-        const student = new Student({ id: id })
-        await student.read()
-        response.status(200)
-        const studentSerializer = new StudentSerializer(
-            response.getHeader('Content-Type'),
-            ['createdAt', 'updatedAt']
-        )
-        response.send(
-            studentSerializer.serializer(student)
-        )
-    } catch (error) {
-        nextMiddleware(error)
-    }
 })
 
 router.post('/', async (request, response, nextMiddleware) => {
@@ -48,6 +38,31 @@ router.post('/', async (request, response, nextMiddleware) => {
         nextMiddleware(error)
     }
 
+})
+
+router.options('/:idStudent', (request, response) => {
+    response.set('Access-Control-Allow-Methods', 'GET, PUT, DELETE')
+    response.set('Access-Control-Allow-Headers', 'Content-Type')
+    response.status(204)
+    response.end()
+})
+
+router.get('/:idStudent', async (request, response, nextMiddleware) => {
+    try {
+        const id = request.params.idStudent
+        const student = new Student({ id: id })
+        await student.read()
+        response.status(200)
+        const studentSerializer = new StudentSerializer(
+            response.getHeader('Content-Type'),
+            ['createdAt', 'updatedAt']
+        )
+        response.send(
+            studentSerializer.serializer(student)
+        )
+    } catch (error) {
+        nextMiddleware(error)
+    }
 })
 
 router.put('/:idStudent', async (request, response, nextMiddleware) => {
@@ -78,6 +93,7 @@ router.delete('/:idStudent', async (request, response, nextMiddleware) => {
 })
 
 const routerEnrollments = require('../enrollments')
+const { request, response } = require('express')
 
 const verifyStudent = async (request, response, nextMiddleware) => {
     try{

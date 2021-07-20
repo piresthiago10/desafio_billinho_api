@@ -4,6 +4,13 @@ const Enrollment = require('./Enrollment')
 const { request, response } = require('express')
 const Serializer = require('../../Serializer').EnrollmentSerializer
 
+router.options('/', (request, response) => {
+    response.set('Access-Control-Allow-Methods', 'GET, POST')
+    response.set('Access-Control-Allow-Headers', 'Content-Type')
+    response.status(204)
+    response.end()
+})
+
 router.get('/', async (request, response) => {
     const enrollments = await TableEnrollments.listEnrollments(request.student.id)
     const serializer = new Serializer(
@@ -24,6 +31,9 @@ router.post('/', async (request, response, nextMiddleware) => {
         const serializer = new Serializer(
             response.getHeader('Content-Type')
         )
+        const timestamp = (new Date(enrollment.updatedAt)).getTime()
+        response.set('Last-Modified', timestamp)
+        response.set('Location', `/api/students/${enrollment.student}/enrollment/${enrollment.id}`)
         response.status(201)
         response.send(
             serializer.serializer(enrollment)
@@ -31,6 +41,13 @@ router.post('/', async (request, response, nextMiddleware) => {
     } catch (error) {
         nextMiddleware(error)
     }
+})
+
+router.options('/:id', (request, response) => {
+    response.set('Access-Control-Allow-Methods', 'DELETE, GET, PUT')
+    response.set('Access-Control-Allow-Headers', 'Content-Type')
+    response.status(204)
+    response.end()
 })
 
 router.delete('/:id', async (request, response) => {
@@ -58,6 +75,8 @@ router.get('/:id', async (request, response, nextMiddleWare) => {
             response.getHeader('Content-Type'),
             ['student', 'createdAt', 'updatedAt']
         )
+        const timestamp = (new Date(enrollment.updatedAt)).getTime()
+        response.set('Last-Modified', timestamp)
         response.send(
             serializer.serializer(enrollment)
         )
@@ -80,6 +99,9 @@ router.put('/:id', async (request, response, nextMiddleWare) => {
     
         const enrollment = new Enrollment(data)
         await enrollment.update()
+        await enrollment.read()
+        const timestamp = (new Date(enrollment.updatedAt)).getTime()
+        response.set('Last-Modified', timestamp)
         response.status(204)
         response.end()
     } catch (error) {
