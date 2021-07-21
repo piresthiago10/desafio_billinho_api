@@ -18,7 +18,7 @@ module.exports = {
         })
 
         if (!read) {
-            throw new NotFound()
+            throw new NotFound('Estudante')
         }
 
         return read
