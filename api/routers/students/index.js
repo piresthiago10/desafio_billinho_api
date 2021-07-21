@@ -15,7 +15,13 @@ router.get('/', async (request, response) => {
     const results = await TableStudents.listStudents()
     response.status(200)
     const studentSerializer = new StudentSerializer(
-        response.getHeader('Content-Type')
+        response.getHeader('Content-Type'),
+        ['name',
+        'cpf',
+        'birthdate',
+        'payment_method',
+        'createdAt',
+        'updatedAt']
     )
     response.send(
         studentSerializer.serializer(results)
@@ -55,7 +61,12 @@ router.get('/:idStudent', async (request, response, nextMiddleware) => {
         response.status(200)
         const studentSerializer = new StudentSerializer(
             response.getHeader('Content-Type'),
-            ['createdAt', 'updatedAt']
+            ['name',
+            'cpf',
+            'birthdate',
+            'payment_method',
+            'createdAt',
+            'updatedAt']
         )
         response.send(
             studentSerializer.serializer(student)

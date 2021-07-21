@@ -1,6 +1,6 @@
 const models = [
     require('../routers/students/ModelStudents'),
-    // require('../routers/bills/ModelBills'),
+    require('../routers/bills/ModelBills'),
     require('../routers/enrollments/ModelEnrollments')
 ]
 

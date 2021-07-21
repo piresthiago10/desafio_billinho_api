@@ -3,6 +3,8 @@ const moment = require('moment')
 moment.suppressDeprecationWarnings = true; 
 const EmptyData = require('../../errors/EmptyData')
 const InvalidValue = require('../../errors/InvalidValue')
+const Bill = require('../bills/Bill')
+const TableBills = require('../bills/TableBills')
 
 class Enrollment {
     constructor({ id, amount, installments, due_day, student, createdAt, updatedAt }) {
@@ -27,6 +29,7 @@ class Enrollment {
         this.id = result.id
         this.createdAt = result.createdAt
         this.updatedAt = result.updatedAt
+        await this.setBills()
     }
 
     async read () {
@@ -79,9 +82,41 @@ class Enrollment {
             throw new InvalidValue('installments')
         }
 
-        if (moment(this.due_day, "DD").isValid() == false || this.due_day <= 0){
+        if (moment(this.due_day, "DD").isValid() == false || this.due_day.length === 0){
             throw new InvalidValue('due_day')
         }
+    }
+
+    async setBills () {
+
+        try{
+            for (let day = 0; day < this.installments; day++) {
+                let data = {
+                    amount: parseInt(this.amount / this.installments),
+                    due_date: this.setBillDueDate(day),
+                    status: 'open',
+                    enrollment: this.id
+                }
+                const bill = new Bill(data)
+                await TableBills.create(data)
+            }
+        } catch (error) {
+            throw InvalidValue(error)
+        }
+
+    }
+
+    setBillDueDate (day) {
+        let today = parseInt(moment().format("DD"))
+        let due_date
+
+        if (this.due_day < today) {
+            due_date = moment(this.due_day, "DD/MM/YYYY").add(day + 1, 'M').format("YYYY/MM/DD")
+        } else {
+            due_date = moment(this.due_day, "DD/MM/YYYY").add(day, 'M').format("YYYY/MM/DD")
+        }
+
+        return due_date
     }
 }
 
