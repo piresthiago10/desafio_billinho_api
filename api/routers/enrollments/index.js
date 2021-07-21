@@ -1,8 +1,19 @@
 const router = require('express').Router({ mergeParams: true })
 const TableEnrollments = require('./TableEnrollments')
+const TableBills = require('../bills/TableBills')
 const Enrollment = require('./Enrollment')
 const { request, response } = require('express')
 const Serializer = require('../../Serializer').EnrollmentSerializer
+const config = require('config')
+const basicAuth = require('express-basic-auth')
+
+const username = config.get('access.login')
+const password = config.get('access.password')
+
+const basicAuthMiddleware = basicAuth({
+    challenge: true,
+    users: { [username]: password }
+   });
 
 router.options('/', (request, response) => {
     response.set('Access-Control-Allow-Methods', 'GET, POST')
@@ -18,25 +29,32 @@ router.get('/', async (request, response) => {
     )
     response.send(
         serializer.serializer(enrollments)
+
     )
 })
 
-router.post('/', async (request, response, nextMiddleware) => {
+router.post('/', basicAuthMiddleware, async (request, response, nextMiddleware) => {
     try {
+
         const idStudent = request.student.id
         const body = request.body
         const data = Object.assign({}, body, { student: idStudent })
         const enrollment = new Enrollment(data)
         await enrollment.create()
+
+        const bills = await TableBills.listBills(enrollment.id)
+        const nestedData = Object.assign({"bills": bills}, enrollment)
+
         const serializer = new Serializer(
             response.getHeader('Content-Type')
         )
+
         const timestamp = (new Date(enrollment.updatedAt)).getTime()
         response.set('Last-Modified', timestamp)
         response.set('Location', `/api/students/${enrollment.student}/enrollment/${enrollment.id}`)
         response.status(201)
         response.send(
-            serializer.serializer(enrollment)
+            serializer.serializer(nestedData)
         )
     } catch (error) {
         nextMiddleware(error)
@@ -108,6 +126,5 @@ router.put('/:id', async (request, response, nextMiddleWare) => {
         nextMiddleWare(error)
     }
 })
-
 
 module.exports = router
