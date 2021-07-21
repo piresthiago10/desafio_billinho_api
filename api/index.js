@@ -38,9 +38,7 @@ app.use('/api/students', students)
 const enrollments = require('./routers/enrollments')
 app.use('/api/enrollments', enrollments)
 
-const bills = require('./routers/bills')
 const { request, response } = require('express')
-app.use('/api/bills', bills)
 
 app.use((error, request, response, nextMiddleware) => {
     let status = 500
