@@ -46,11 +46,7 @@ class StudentSerializer extends Serializer {
         super()
         this.contentType = contentType
         this.publicData = [
-            'id',
-            'name',
-            'cpf',
-            'birthdate',
-            'payment_method'
+            'id'
         ].concat(extraData || [])
     }
 }
@@ -64,9 +60,25 @@ class EnrollmentSerializer extends Serializer {
             'amount',
             'installments',
             'due_day',
+            'bills',
         ].concat(extraData || [])
         this.tagSingular = 'enrollment'
         this.tagPlural = 'enrollments'
+    }
+}
+
+class BillSerializer extends Serializer {
+    constructor (contentType, extraData) {
+        super()
+        this.contentType = contentType
+        this.publicData = [
+            'id',
+            'amount',
+            'due_day',
+            'status',
+        ].concat(extraData || [])
+        this.tagSingular = 'bill'
+        this.tagPlural = 'bills'
     }
 }
 
@@ -86,5 +98,6 @@ module.exports = {
     StudentSerializer: StudentSerializer,
     ErrorSerializer: ErrorSerializer,
     EnrollmentSerializer: EnrollmentSerializer,
+    BillSerializer: BillSerializer,
     acceptedFormats: ['application/json']
 }
